@@ -1,0 +1,61 @@
+# Configuration for the stock signal ML pipeline.
+# Everything the pipeline does is driven by this file so you can retune
+# without touching code.
+
+data:
+  ticker: "AAPL"        # any yfinance symbol: AAPL, SPY, MSFT, BTC-USD, ...
+  start: "2015-01-01"   # first date of history to download
+  end: null             # null => up to today
+  interval: "1d"        # 1d, 1wk, 1mo (daily recommended for these indicators)
+
+labels:
+  horizon: 1            # BUY if close[t+horizon] > close[t], else SELL
+
+dataset:
+  train_frac: 0.70
+  val_frac: 0.15
+  test_frac: 0.15       # split is chronological (no shuffling of time series)
+
+feature_selection:
+  top_n: 20             # keep the top-N most important features (Random Forest)
+
+models:
+  random_forest:
+    n_estimators: 300
+    max_depth: null
+    class_weight: "balanced"
+  xgboost:
+    n_estimators: 400
+    max_depth: 5
+    learning_rate: 0.05
+    subsample: 0.9
+    colsample_bytree: 0.9
+  logistic_regression:
+    max_iter: 1000
+    C: 1.0
+  lstm:
+    enabled: true       # requires torch; auto-skips with a warning if unavailable
+    seq_len: 20
+    hidden_size: 64
+    num_layers: 1
+    dropout: 0.2
+    epochs: 30
+    lr: 0.001
+    batch_size: 32
+
+# Metric used to pick the "best" model on the validation set.
+# one of: roc_auc, f1, accuracy, precision, recall
+selection_metric: "roc_auc"
+
+signal:
+  buy_threshold: 0.70   # P(up) > this  => BUY
+  sell_threshold: 0.30  # P(up) < this  => SELL, otherwise HOLD
+
+risk:
+  account_equity: 10000.0
+  risk_per_trade: 0.01  # risk 1% of account per trade
+  atr_stop_mult: 2.0    # stop loss  = 2 x ATR
+  atr_take_mult: 3.0    # take profit = 3 x ATR
+
+paths:
+  artifacts_dir: "artifacts"
