@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stock Signal Pipeline</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Stock Signal Pipeline</h1>
+      <p class="sub">
+        Technical indicators &rarr; ML models &rarr; BUY / SELL / HOLD with ATR risk plan.
+        <span class="muted">BUY if P(up) &gt; {{ buy_threshold }}, SELL if &lt; {{ sell_threshold }}.</span>
+      </p>
+    </header>
+
+    <section class="panel controls">
+      <div class="field">
+        <label for="ticker">Ticker</label>
+        <input id="ticker" type="text" value="{{ default_ticker }}" placeholder="AAPL"
+               autocomplete="off" spellcheck="false">
+      </div>
+      <div class="field">
+        <label for="start">History from</label>
+        <input id="start" type="date" value="2015-01-01">
+      </div>
+      <div class="buttons">
+        <button id="btn-train" class="btn primary">Train</button>
+        <button id="btn-predict" class="btn accent">Get Signal</button>
+        <button id="btn-retrain" class="btn ghost">Retrain</button>
+      </div>
+    </section>
+
+    <div id="model-status" class="model-status">Checking for a trained model&hellip;</div>
+
+    <section id="signal-card" class="panel signal hidden">
+      <div class="signal-head">
+        <div id="signal-badge" class="badge">HOLD</div>
+        <div class="signal-meta">
+          <div id="signal-title">&mdash;</div>
+          <div id="signal-sub" class="muted">&mdash;</div>
+        </div>
+        <div class="prob">
+          <div class="prob-value" id="prob-value">&mdash;</div>
+          <div class="prob-label">P(up)</div>
+        </div>
+      </div>
+      <div class="grid" id="plan-grid"></div>
+    </section>
+
+    <section id="metrics-panel" class="panel hidden">
+      <h2>Model evaluation <span class="muted" id="metrics-note"></span></h2>
+      <div class="table-scroll">
+        <table id="metrics-table">
+          <thead>
+            <tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>ROC&nbsp;AUC</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Activity <span id="spinner" class="spinner hidden"></span></h2>
+      <pre id="log" class="log">Ready.</pre>
+    </section>
+
+    <footer class="muted">
+      Educational tool &mdash; not financial advice. Next-day direction is near a coin flip; verify before risking money.
+    </footer>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

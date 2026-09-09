@@ -20,13 +20,32 @@ Load OHLCV  ->  Clean  ->  Feature engineering  ->  Label (up/down)
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 # LSTM is optional; install the CPU build of torch to enable it:
 pip install torch --index-url https://download.pytorch.org/whl/cpu
 ```
 
-## Usage
+## Run the app (easiest)
+
+```bash
+python app.py
+```
+
+That starts a local web app and opens <http://127.0.0.1:5000> in your browser.
+Type a ticker and press a button:
+
+- **Train** — downloads data, builds features, trains all four models, shows the
+  evaluation table and saves everything.
+- **Get Signal** — runs the newest bar through the best saved model and shows
+  BUY / SELL / HOLD with entry, stop loss, take profit and position size.
+- **Retrain** — the monthly refresh; retrains on the latest data and archives a
+  snapshot.
+
+Each ticker gets its own folder under `artifacts/`, so you can train several
+symbols and switch between them without retraining.
+
+## Usage from the command line
 
 Everything is controlled by `config.yaml` (ticker, dates, top-N features,
 model hyperparameters, signal thresholds, risk settings).
@@ -84,6 +103,7 @@ python -m stockpipe predict --ticker MSFT
 | Prediction Loop / Signal  | `stockpipe/pipeline.py`, `stockpipe/risk.py` |
 | Risk Management           | `stockpipe/risk.py` |
 | Continuous Learning       | `stockpipe/pipeline.py::retrain` |
+| Buttons / UI              | `app.py`, `templates/`, `static/` |
 
 Artifacts (saved model, scaler, selected features, metrics, metadata) are
 written to `artifacts/`.
